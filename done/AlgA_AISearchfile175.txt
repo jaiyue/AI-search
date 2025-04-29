@@ -1,0 +1,13 @@
+USER = llpw83 (H Cai),
+ALGORITHM CODE = GA, NAME OF CITY-FILE = AISearchfile175.txt,
+SIZE = 175, TOUR LENGTH = 21791,
+39,145,47,12,82,119,81,103,3,162,45,125,170,161,28,74,51,136,5,165,107,120,56,141,95,153,36,108,151,10,142,70,54,72,13,60,25,133,173,148,50,27,122,90,132,115,4,61,35,154,1,100,52,79,22,68,111,109,53,121,160,129,31,172,150,99,116,59,44,65,93,112,18,134,92,106,98,11,127,131,15,118,163,86,152,168,130,144,76,9,96,0,71,97,14,19,139,171,8,34,143,67,155,167,169,164,83,124,166,7,140,58,49,147,66,42,20,80,159,91,64,2,110,23,6,104,41,146,57,30,101,69,126,21,33,77,105,37,94,138,174,17,43,24,102,114,32,89,158,113,157,88,29,46,55,26,73,48,137,16,123,75,156,78,135,149,85,128,38,117,63,87,62,40,84,
+NOTE = Multi-start Nearest Neighbor Initialization: Execute the nearest neighbor algorithm from multiple different starting points to construct initial solutions, improving the quality and diversity of the initial population.
+Elite Selection: Preserve the best individuals in each generation without subjecting them to crossover and mutation, preventing the loss of optimal solutions during evolution.
+Top-k Parent Selection: Select the top-ranking individuals as parents based on path length sorting, ensuring crossover occurs between high-quality solutions.
+Partially Mapped Crossover (PMX): Exchange gene segments between two parents while maintaining city uniqueness to generate valid offspring paths.
+Reverse Mutation: Randomly select and reverse a segment of the path to break out of local optima and increase population diversity.
+The parameter values are 'max_it' = 800 and 'pop_size' = 150.
+RUN-TIME = 53.2 seconds.
+DATE-TIME = 29/04/2025-20:57:11.
+CERTIFICATE = 12395.

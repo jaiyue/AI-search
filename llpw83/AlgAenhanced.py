@@ -270,7 +270,7 @@ print("The codes and tariffs have been read from 'alg_codes_and_tariffs.txt':")
 ############
 ############ END OF SECTOR 5 (IGNORE THIS COMMENT)
 
-my_user_name = "abcd12"
+my_user_name = "llpw83"
 
 ############ START OF SECTOR 6 (IGNORE THIS COMMENT)
 ############
@@ -283,8 +283,8 @@ my_user_name = "abcd12"
 ############
 ############ END OF SECTOR 6 (IGNORE THIS COMMENT)
 
-my_first_name = ""
-my_last_name = ""
+my_first_name = "H"
+my_last_name = "Cai"
 
 ############ START OF SECTOR 7 (IGNORE THIS COMMENT)
 ############
@@ -294,7 +294,7 @@ my_last_name = ""
 ############
 ############ END OF SECTOR 7 (IGNORE THIS COMMENT)
 
-algorithm_code = "XX"
+algorithm_code = "GA"
 
 ############ START OF SECTOR 8 (IGNORE THIS COMMENT)
 ############
@@ -330,7 +330,7 @@ start_time = time.time()
 ############
 ############ END OF SECTOR 8 (IGNORE THIS COMMENT)
 
-added_note = ""
+added_note = "Multi-start Nearest Neighbor Initialization: Execute the nearest neighbor algorithm from multiple different starting points to construct initial solutions, improving the quality and diversity of the initial population.\nElite Selection: Preserve the best individuals in each generation without subjecting them to crossover and mutation, preventing the loss of optimal solutions during evolution.\nTop-k Parent Selection: Select the top-ranking individuals as parents based on path length sorting, ensuring crossover occurs between high-quality solutions.\nPartially Mapped Crossover (PMX): Exchange gene segments between two parents while maintaining city uniqueness to generate valid offspring paths.\nReverse Mutation: Randomly select and reverse a segment of the path to break out of local optima and increase population diversity."
 
 ############ START OF SECTOR 9 (IGNORE THIS COMMENT)
 ############
@@ -355,25 +355,113 @@ added_note = ""
 ############
 ############ END OF SECTOR 9 (IGNORE THIS COMMENT)
 
+# sum of tour length
+def calculate_tour_length(tour, dist_matrix):
+    length = 0
+    for i in range(len(tour)):
+        length += dist_matrix[tour[i]][tour[(i + 1) % len(tour)]]
+    return length
 
+# using Multi-start Nearest Neighbor to find initialize path
+def nearest_neighbor_solution(dist_matrix, start_city):
+    num_cities = len(dist_matrix)
+    unvisited = set(range(num_cities))
+    tour = [start_city]
+    unvisited.remove(start_city)
 
+    while unvisited:
+        last_city = tour[-1]
+        next_city = min(unvisited, key=lambda city: dist_matrix[last_city][city])
+        tour.append(next_city)
+        unvisited.remove(next_city)
 
+    return tour
 
+def initialize_population(pop_size, num_cities, dist_matrix):
+    population = []
+    for _ in range(pop_size):
+        start_city = random.randint(0, num_cities - 1)
+        tour = nearest_neighbor_solution(dist_matrix, start_city)
+        population.append(tour)
+    return population
 
+# Elite Selection: Preserving the Best Individuals for the Next Generation
+def elite_selection(population, dist_matrix, num_elites):
+    sorted_population = sorted(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+    return sorted_population[:num_elites]
 
+# Select the first few best individuals from the population as parents
+def selection(population, dist_matrix, num_parents):
+    sorted_population = sorted(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+    return sorted_population[:num_parents]
 
+# Partially_Mapped_Crossover
+def Partially_Mapped_Crossover(parent1, parent2):
+    size = len(parent1)
+    start, end = sorted(random.sample(range(size), 2))
+    child = [-1] * size
+    child[start:end + 1] = parent1[start:end + 1]
+    for i in range(size):
+        if parent2[i] not in child:
+            for j in range(size):
+                if child[j] == -1:
+                    child[j] = parent2[i]
+                    break
+    return child
 
+# reverse-ordering of a random part of a path
+def reverse_mutation(tour, mutation_rate):
+    if random.random() < mutation_rate:
+        start, end = sorted(random.sample(range(len(tour)), 2))
+        tour[start:end+1] = tour[start:end+1][::-1]
+    return tour
 
+# Main function with all parameters configurable
+def genetic_algorithm(
+    num_cities,
+    dist_matrix,
+    max_it=800,
+    pop_size=150,
+    mutation_rate=0.05,
+    num_parents=5,
+    num_elites=2,
+    time_limit=55
+):
+    start_time = time.time()
 
+    population = initialize_population(pop_size, num_cities, dist_matrix)  
+    tour = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+    tour_length = calculate_tour_length(tour, dist_matrix)
 
+    for iteration in range(max_it):
+        # if time.time() - start_time > time_limit:
+        #     print(f"Time limit reached at iteration {iteration}.")
+        #     break
+        
+        elites = elite_selection(population, dist_matrix, num_elites)
+        parents = selection(population, dist_matrix, num_parents)
+        new_population = elites[:]
+        
+        while len(new_population) < pop_size:
+            parent1, parent2 = random.sample(parents, 2)
+            child = Partially_Mapped_Crossover(parent1, parent2)
+            child = reverse_mutation(child, mutation_rate)
+            new_population.append(child)
+        
+        population = new_population
+        
+        current_best = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+        current_length = calculate_tour_length(current_best, dist_matrix)
+        if current_length < tour_length:
+            tour = current_best
+            tour_length = current_length
 
+    return tour, tour_length, max_it, pop_size
 
+tour, tour_length, max_it, pop_size = genetic_algorithm(num_cities, dist_matrix)
 
-
-
-
-
-
+print("Best tour:", tour)
+print("Tour length:", tour_length)
 
 
 

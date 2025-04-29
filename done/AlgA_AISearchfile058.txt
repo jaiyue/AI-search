@@ -1,0 +1,13 @@
+USER = llpw83 (H Cai),
+ALGORITHM CODE = GA, NAME OF CITY-FILE = AISearchfile058.txt,
+SIZE = 58, TOUR LENGTH = 26452,
+26,20,29,19,56,15,55,31,49,43,32,17,10,2,6,38,25,41,11,40,42,37,30,52,24,47,54,4,36,3,57,7,28,27,1,5,44,39,0,50,9,33,22,48,21,8,12,16,51,18,45,35,14,53,46,34,23,13,
+NOTE = Multi-start Nearest Neighbor Initialization: Execute the nearest neighbor algorithm from multiple different starting points to construct initial solutions, improving the quality and diversity of the initial population.
+Elite Selection: Preserve the best individuals in each generation without subjecting them to crossover and mutation, preventing the loss of optimal solutions during evolution.
+Top-k Parent Selection: Select the top-ranking individuals as parents based on path length sorting, ensuring crossover occurs between high-quality solutions.
+Partially Mapped Crossover (PMX): Exchange gene segments between two parents while maintaining city uniqueness to generate valid offspring paths.
+Reverse Mutation: Randomly select and reverse a segment of the path to break out of local optima and increase population diversity.
+The parameter values are 'max_it' = 800 and 'pop_size' = 150.
+RUN-TIME = 8.4 seconds.
+DATE-TIME = 29/04/2025-20:56:18.
+CERTIFICATE = 2885.
