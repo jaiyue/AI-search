@@ -17,6 +17,7 @@ import time
 import random
 from datetime import datetime
 
+
 ############ START OF SECTOR 0 (IGNORE THIS COMMENT)
 ############
 ############ NOW PLEASE SCROLL DOWN UNTIL THE NEXT BLOCK OF CAPITALIZED COMMENTS.
@@ -294,7 +295,7 @@ my_last_name = "Cai"
 ############
 ############ END OF SECTOR 7 (IGNORE THIS COMMENT)
 
-algorithm_code = "XX"
+algorithm_code = "GA"
 
 ############ START OF SECTOR 8 (IGNORE THIS COMMENT)
 ############
@@ -330,7 +331,11 @@ start_time = time.time()
 ############
 ############ END OF SECTOR 8 (IGNORE THIS COMMENT)
 
-added_note = ""
+added_note = ("- **ournament Selection**: Randomly select several individuals from the population and choose the one with the best fitness as the parent.\n"
+"- **Order Crossover (OX)**: Preserve a subsequence from one parent, then fill the remaining positions in the order they appear in the other parent.\n"
+"- **Swap Mutation**: Exchange the positions of two cities in the path with a certain probability to increase genetic diversity.\n"
+"- **Fixed Generation Iteration (max_it)**: The algorithm terminates the evolution process after reaching a set maximum number of iterations.\n"
+"- **Time Limit (55-second termination)**: If the runtime exceeds 55 seconds, the algorithm will terminate early and return the current best solution.")
 
 ############ START OF SECTOR 9 (IGNORE THIS COMMENT)
 ############
@@ -356,8 +361,87 @@ added_note = ""
 ############ END OF SECTOR 9 (IGNORE THIS COMMENT)
 
 
+# sum of tour length
+def calculate_tour_length(tour, dist_matrix):
+    length = 0
+    for i in range(len(tour)):
+        length += dist_matrix[tour[i]][tour[(i + 1) % len(tour)]]
+    return length
 
+# Initialise population, generate randomly ordered paths
+def initialize_population(pop_size, num_cities):
+    return [random.sample(range(num_cities), num_cities) for _ in range(pop_size)]
 
+# Tournament selection, randomly select k individuals from the population and return the best of them
+def tournament_selection(population, dist_matrix, k=5):
+    selected = random.sample(population, k)
+    selected.sort(key=lambda tour: calculate_tour_length(tour, dist_matrix))
+    return selected[0]
+
+# Order Crossover: generates an offspring by preserving part of parent1 and completing it with parent2
+def crossover(parent1, parent2):
+    size = len(parent1)
+    start, end = sorted(random.sample(range(size), 2))
+    child = [-1] * size
+    child[start:end+1] = parent1[start:end+1]
+    ptr = 0
+    for city in parent2:
+        if city not in child:
+            while child[ptr] != -1:
+                ptr += 1
+            child[ptr] = city
+    return child
+
+# swaps two cities with a certain probability
+def mutate(tour, mutation_rate=0.02):
+    for i in range(len(tour)):
+        if random.random() < mutation_rate:
+            j = random.randint(0, len(tour) - 1)
+            tour[i], tour[j] = tour[j], tour[i]
+    return tour
+
+# Main function
+def genetic_algorithm(num_cities, dist_matrix, max_it=800, pop_size=200, mutation_rate=0.02):
+    start_time = time.time()
+
+    population = initialize_population(pop_size, num_cities)
+    
+    tour = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+    tour_length = calculate_tour_length(tour, dist_matrix)
+
+    for iteration in range(max_it):
+        # limit of 55 seconds
+        if time.time() - start_time > 55:
+            print(f"⏱️ Time limit reached at iteration {iteration}.")
+            break
+
+        new_population = []
+        for _ in range(pop_size):
+            parent1 = tournament_selection(population, dist_matrix)
+            parent2 = tournament_selection(population, dist_matrix)
+
+            child = crossover(parent1, parent2)
+
+            child = mutate(child, mutation_rate)
+
+            new_population.append(child)
+
+        # Update the population
+        population = new_population
+
+        # Update the current best solution
+        current_best = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+        current_length = calculate_tour_length(current_best, dist_matrix)
+        if current_length < tour_length:
+            tour = current_best
+            tour_length = current_length
+
+    return tour, tour_length, max_it, pop_size
+
+tour, tour_length, max_it, pop_size = genetic_algorithm(num_cities, dist_matrix)
+
+print("tour:",tour)
+print("tour_length:",tour_length)
 
 
 

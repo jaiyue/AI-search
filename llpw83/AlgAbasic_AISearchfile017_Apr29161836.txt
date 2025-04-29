@@ -1,0 +1,13 @@
+USER = llpw83 (H Cai),
+ALGORITHM CODE = GA, NAME OF CITY-FILE = AISearchfile017.txt,
+SIZE = 17, TOUR LENGTH = 1545,
+6,1,13,0,15,16,12,5,7,14,11,3,10,8,4,9,2,
+NOTE = - **ournament Selection**: Randomly select several individuals from the population and choose the one with the best fitness as the parent.
+- **Order Crossover (OX)**: Preserve a subsequence from one parent, then fill the remaining positions in the order they appear in the other parent.
+- **Swap Mutation**: Exchange the positions of two cities in the path with a certain probability to increase genetic diversity.
+- **Fixed Generation Iteration (max_it)**: The algorithm terminates the evolution process after reaching a set maximum number of iterations.
+- **Time Limit (55-second termination)**: If the runtime exceeds 55 seconds, the algorithm will terminate early and return the current best solution.
+The parameter values are 'max_it' = 800 and 'pop_size' = 200.
+RUN-TIME = 4.6 seconds.
+DATE-TIME = 29/04/2025-16:18:36.
+CERTIFICATE = 1772.
