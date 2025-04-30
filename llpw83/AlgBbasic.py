@@ -270,7 +270,7 @@ print("The codes and tariffs have been read from 'alg_codes_and_tariffs.txt':")
 ############
 ############ END OF SECTOR 5 (IGNORE THIS COMMENT)
 
-my_user_name = "abcd12"
+my_user_name = "llpw83"
 
 ############ START OF SECTOR 6 (IGNORE THIS COMMENT)
 ############
@@ -283,8 +283,8 @@ my_user_name = "abcd12"
 ############
 ############ END OF SECTOR 6 (IGNORE THIS COMMENT)
 
-my_first_name = ""
-my_last_name = ""
+my_first_name = "H"
+my_last_name = "Cai"
 
 ############ START OF SECTOR 7 (IGNORE THIS COMMENT)
 ############
@@ -294,7 +294,7 @@ my_last_name = ""
 ############
 ############ END OF SECTOR 7 (IGNORE THIS COMMENT)
 
-algorithm_code = "XX"
+algorithm_code = "AC"
 
 ############ START OF SECTOR 8 (IGNORE THIS COMMENT)
 ############
@@ -356,24 +356,111 @@ added_note = ""
 ############ END OF SECTOR 9 (IGNORE THIS COMMENT)
 
 
+# build tour for an ant
+def single_path(num_cities, dist_matrix, pheromone, alpha, beta):
+    current = random.randint(0, num_cities - 1)
+    tour = [current]
+    visited = {current}
+    
+    while len(tour) < num_cities:
+        next_city = selection(current, num_cities, visited, dist_matrix, pheromone, alpha, beta)
+        tour.append(next_city)
+        visited.add(next_city)
+        current = next_city
+    
+    return tour
+
+# Use pheromone levels and heuristics to calculate the probability of the next city and then randomly select it based on these probabilities
+def selection(current, num_cities, visited, dist_matrix, pheromone, alpha, beta):
+    probabilities = []
+    total = 0
+    
+    for city in range(num_cities):
+        if city not in visited:
+            phe = pheromone[current][city]
+            distance = dist_matrix[current][city]
+            eta = 1.0 / (distance if distance != 0 else 1e-10)
+            prob = (phe ** alpha) * (eta ** beta)
+            probabilities.append((city, prob))
+            total += prob
+
+    if total == 0:
+        return random.choice([c for c in range(num_cities) if c not in visited])
+    
+    rand_val = random.uniform(0, total)
+    cumulative = 0
+    for city, prob in probabilities:
+        cumulative += prob
+        if cumulative >= rand_val:
+            return city
+
+# tour length calculation
+def compute_length(tour, dist_matrix):
+    total_length = 0
+    num_cities = len(tour)
+    
+    for i in range(num_cities):
+        current_city = tour[i]
+        next_city = tour[(i + 1) % num_cities]
+        distance = dist_matrix[current_city][next_city]
+        total_length += distance
+
+    return total_length
+
+# The pheromones all evaporate proportionally, encouraging the exploration of new paths.
+def evaporate(pheromone, rho):
+    num_cities = len(pheromone)
+    for i in range(num_cities):
+        for j in range(num_cities):
+            pheromone[i][j] *= (1 - rho)
+
+# 信息素沉积函数
+def deposit_pheromone(pheromone, tours, lengths, Q):
+    num_cities = len(pheromone)
+    for k in range(len(tours)):
+        if lengths[k] == 0:
+            continue
+        delta = Q / lengths[k]
+        for i in range(num_cities):
+            a = tours[k][i]
+            b = tours[k][(i+1) % num_cities]
+            pheromone[a][b] += delta
+            pheromone[b][a] += delta
+
+# Main function
+def ant_colony_tsp(num_cities, dist_matrix, num_ants=20, max_it=200, alpha=2, beta=3, rho_start=0.2, rho_end=0.05, Q=1):
+    pheromone = [[1.0 for _ in range(num_cities)] for _ in range(num_cities)]
+    best_tour = None
+    best_length = float('inf')
+    start_time = time.time()
+
+    for iteration in range(max_it):
+        if time.time() - start_time > 58:
+            break
+
+        for _ in range(num_ants):
+            tour = single_path(num_cities, dist_matrix, pheromone, alpha, beta)
+            length = compute_length(tour, dist_matrix)
+
+            if length < best_length:
+                best_length = length
+                best_tour = tour.copy()
+
+        rho = rho_start - (rho_start - rho_end) * (iteration / max_it)
+        evaporate(pheromone, rho) 
+
+    return best_tour, best_length, iteration, num_ants
+
+
+tour, tour_length, max_it, num_ants = ant_colony_tsp(num_cities, dist_matrix)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+############
+############ IF YOU ARE IMPLEMENTING GA THEN:
+############  - IF YOU EXECUTE YOUR MAIN LOOP A FIXED NUMBER OF TIMES THEN USE THE VARIABLE 'max_it' TO DENOTE THIS NUMBER
+############  - USE THE VARIABLE 'pop_size' TO DENOTE THE SIZE OF THE POPULATION (THIS IS 'N' IN THE PSEUDOCODE)
+############
 
 
 
