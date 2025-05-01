@@ -365,31 +365,42 @@ added_note = ("ournament Selection: Randomly select several individuals from the
 def calculate_tour_length(tour, dist_matrix):
     length = 0
     for i in range(len(tour)):
-        length += dist_matrix[tour[i]][tour[(i + 1) % len(tour)]]
+        next_city = tour[(i + 1) % len(tour)]
+        length += dist_matrix[tour[i]][next_city]
     return length
 
 # Initialise population, generate randomly ordered paths
 def initialize_population(pop_size, num_cities):
-    return [random.sample(range(num_cities), num_cities) for _ in range(pop_size)]
+    population = []
+    for _ in range(pop_size):
+        tour = list(range(num_cities))
+        random.shuffle(tour)
+        population.append(tour)
+    return population
 
 # Tournament selection: randomly select k individuals from the population and return the best of them
 def tournament_selection(population, dist_matrix, k):
-    selected = random.sample(population, k)
-    selected.sort(key=lambda tour: calculate_tour_length(tour, dist_matrix))
-    return selected[0]
+    candidates = random.sample(population, k)
+    candidates.sort(key=lambda tour: calculate_tour_length(tour, dist_matrix))
+    return candidates[0]
 
 # Order Crossover: generates an offspring by preserving part of parent1 and completing it with parent2
 def crossover(parent1, parent2):
     size = len(parent1)
     start, end = sorted(random.sample(range(size), 2))
     child = [-1] * size
+
+    # Copy a slice from parent1
     child[start:end+1] = parent1[start:end+1]
+
+    # Fill remaining positions with cities from parent2
     ptr = 0
     for city in parent2:
         if city not in child:
             while child[ptr] != -1:
                 ptr += 1
             child[ptr] = city
+
     return child
 
 # Swap Mutation: swaps two cities with a certain probability
@@ -404,46 +415,46 @@ def mutate(tour, mutation_rate):
 def genetic_algorithm(
     num_cities,
     dist_matrix,
-    max_it=800,
+    max_it=500,
     pop_size=150,
-    mutation_rate=0.05,
-    tournament_k=5,
-    time_limit=55
+    mutation_rate=0.2,
+    tournament_size=2,
+    time_limit=58
 ):
     start_time = time.time()
 
+    # Initialize population
     population = initialize_population(pop_size, num_cities)
-    tour = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
-    tour_length = calculate_tour_length(tour, dist_matrix)
+    best_tour = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+    best_length = calculate_tour_length(best_tour, dist_matrix)
 
     for iteration in range(max_it):
-        # if time.time() - start_time > time_limit:
-        #     print(f"Time limit reached at iteration {iteration}.")
-        #     break
+        # Uncomment to add a time constraint
+        if time.time() - start_time > time_limit:
+            break
 
         new_population = []
         for _ in range(pop_size):
-            parent1 = tournament_selection(population, dist_matrix, tournament_k)
-            parent2 = tournament_selection(population, dist_matrix, tournament_k)
+            parent1 = tournament_selection(population, dist_matrix, tournament_size)
+            parent2 = tournament_selection(population, dist_matrix, tournament_size)
             child = crossover(parent1, parent2)
             child = mutate(child, mutation_rate)
             new_population.append(child)
 
+        # Update population
         population = new_population
 
+        # Update best solution if improved
         current_best = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
         current_length = calculate_tour_length(current_best, dist_matrix)
-        if current_length < tour_length:
-            tour = current_best
-            tour_length = current_length
 
-    return tour, tour_length, max_it, pop_size
+        if current_length < best_length:
+            best_tour = current_best
+            best_length = current_length
+
+    return best_tour, best_length, max_it, pop_size
 
 tour, tour_length, max_it, pop_size = genetic_algorithm(num_cities, dist_matrix)
-
-print("tour:",tour)
-print("tour_length:",tour_length)
-
 
 
 ############ START OF SECTOR 10 (IGNORE THIS COMMENT)

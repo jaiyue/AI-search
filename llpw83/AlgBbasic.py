@@ -363,7 +363,7 @@ def single_path(num_cities, dist_matrix, pheromone, alpha, beta):
     visited = {current}
     
     while len(tour) < num_cities:
-        next_city = selection(current, num_cities, visited, dist_matrix, pheromone, alpha, beta)
+        next_city = selection(current, visited, dist_matrix, pheromone, alpha, beta)
         tour.append(next_city)
         visited.add(next_city)
         current = next_city
@@ -371,27 +371,26 @@ def single_path(num_cities, dist_matrix, pheromone, alpha, beta):
     return tour
 
 # Use pheromone levels and heuristics to calculate the probability of the next city and then randomly select it based on these probabilities
-def selection(current, num_cities, visited, dist_matrix, pheromone, alpha, beta):
+def selection(current, visited, dist_matrix, pheromone, alpha, beta):
     probabilities = []
-    total = 0
-    
-    for city in range(num_cities):
+    total = 0.0
+
+    for city in range(len(dist_matrix)):
         if city not in visited:
-            phe = pheromone[current][city]
-            distance = dist_matrix[current][city]
-            eta = 1.0 / (distance if distance != 0 else 1e-10)
-            prob = (phe ** alpha) * (eta ** beta)
-            probabilities.append((city, prob))
-            total += prob
+            pher = pheromone[current][city]
+            eta = 1.0 / (dist_matrix[current][city] if dist_matrix[current][city] != 0 else 1e-10)
+            p = (pher ** alpha) * (eta ** beta)
+            probabilities.append((city, p))
+            total += p
 
     if total == 0:
-        return random.choice([c for c in range(num_cities) if c not in visited])
-    
-    rand_val = random.uniform(0, total)
-    cumulative = 0
-    for city, prob in probabilities:
-        cumulative += prob
-        if cumulative >= rand_val:
+        return random.choice([c for c in range(len(dist_matrix)) if c not in visited])
+
+    r = random.uniform(0, total)
+    s = 0.0
+    for city, p in probabilities:
+        s += p
+        if s >= r:
             return city
 
 # tour length calculation
@@ -414,31 +413,18 @@ def evaporate(pheromone, rho):
         for j in range(num_cities):
             pheromone[i][j] *= (1 - rho)
 
-# 信息素沉积函数
-def deposit_pheromone(pheromone, tours, lengths, Q):
-    num_cities = len(pheromone)
-    for k in range(len(tours)):
-        if lengths[k] == 0:
-            continue
-        delta = Q / lengths[k]
-        for i in range(num_cities):
-            a = tours[k][i]
-            b = tours[k][(i+1) % num_cities]
-            pheromone[a][b] += delta
-            pheromone[b][a] += delta
-
 # Main function
-def ant_colony_tsp(num_cities, dist_matrix, num_ants=20, max_it=200, alpha=2, beta=3, rho_start=0.2, rho_end=0.05, Q=1):
+def ant_colony_tsp(num_cities, dist_matrix, num_ants=20, max_it=200, alpha=2, beta=3, rho_start=0.2, rho_end=0.05, Q=1, time_limit=58):
     pheromone = [[1.0 for _ in range(num_cities)] for _ in range(num_cities)]
     best_tour = None
     best_length = float('inf')
     start_time = time.time()
 
     for iteration in range(max_it):
-        if time.time() - start_time > 58:
+        if time.time() - start_time > time_limit:
             break
 
-        for _ in range(num_ants):
+        for i in range(num_ants):
             tour = single_path(num_cities, dist_matrix, pheromone, alpha, beta)
             length = compute_length(tour, dist_matrix)
 

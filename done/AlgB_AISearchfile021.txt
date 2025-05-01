@@ -1,8 +1,0 @@
-USER = abcd12 (H Cai),
-ALGORITHM CODE = AC, NAME OF CITY-FILE = AISearchfile021.txt,
-SIZE = 21, TOUR LENGTH = 2681,
-19,6,20,10,2,8,12,17,18,0,11,13,15,1,3,14,5,16,4,9,7,
-NOTE = The parameter values are 'max_it' = 200 and 'num_ants' = 20.
-RUN-TIME = 0.3 seconds.
-DATE-TIME = 30/04/2025-19:38:46.
-CERTIFICATE = 1771.

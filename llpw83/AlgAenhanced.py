@@ -387,13 +387,26 @@ def initialize_population(pop_size, num_cities, dist_matrix):
 
 # Elite Selection: Preserving the Best Individuals for the Next Generation
 def elite_selection(population, dist_matrix, num_elites):
-    sorted_population = sorted(population, key=lambda t: calculate_tour_length(t, dist_matrix))
-    return sorted_population[:num_elites]
+    evaluated_population = []
+    for tour in population:
+        length = calculate_tour_length(tour, dist_matrix)
+        evaluated_population.append((tour, length))
+
+    evaluated_population.sort(key=lambda x: x[1])
+    elites = [pair[0] for pair in evaluated_population[:num_elites]]
+    return elites
+
 
 # Select the first few best individuals from the population as parents
 def selection(population, dist_matrix, num_parents):
     sorted_population = sorted(population, key=lambda t: calculate_tour_length(t, dist_matrix))
     return sorted_population[:num_parents]
+
+# Tournament Selection
+def tournament_selection(population, dist_matrix, tournament_size):
+    selected = random.sample(population, tournament_size)
+    selected.sort(key=lambda t: calculate_tour_length(t, dist_matrix))
+    return selected[0]  # Best individual from tournament
 
 # Partially_Mapped_Crossover
 def Partially_Mapped_Crossover(parent1, parent2):
@@ -416,31 +429,50 @@ def reverse_mutation(tour, mutation_rate):
         tour[start:end+1] = tour[start:end+1][::-1]
     return tour
 
-# Main function with all parameters configurable
+# Main function
 def genetic_algorithm(
     num_cities,
     dist_matrix,
-    max_it=800,
+    max_it=500,
     pop_size=150,
-    mutation_rate=0.05,
-    num_parents=5,
+    mutation_rate=0.2,
+    num_parents=7,
     num_elites=2,
-    time_limit=55
-):
+    time_limit=58,
+    tournament_size=2):
     start_time = time.time()
 
     population = initialize_population(pop_size, num_cities, dist_matrix)  
-    tour = min(population, key=lambda t: calculate_tour_length(t, dist_matrix))
+    best_tour = None
+    best_length = float('inf')
+
+    for t in population:
+        current_length = calculate_tour_length(t, dist_matrix)
+        if current_length < best_length:
+            best_length = current_length
+            best_tour = t
+
+    tour = best_tour
     tour_length = calculate_tour_length(tour, dist_matrix)
+    crossover = Partially_Mapped_Crossover
 
     for iteration in range(max_it):
-        # if time.time() - start_time > time_limit:
-        #     print(f"Time limit reached at iteration {iteration}.")
-        #     break
+        if time.time() - start_time > time_limit:
+            break
         
-        elites = elite_selection(population, dist_matrix, num_elites)
-        parents = selection(population, dist_matrix, num_parents)
-        new_population = elites[:]
+        # After half of the iterations, switch to elite and top parents selection
+        if iteration > max_it // 2:
+            elites = elite_selection(population, dist_matrix, num_elites)
+            parents = selection(population, dist_matrix, num_parents)
+        else:
+            # Before half of the iterations, use tournament selection
+            elites = elite_selection(population, dist_matrix, num_elites)
+            parents = []
+
+            for i in range(num_parents):
+                selected = tournament_selection(population, dist_matrix, tournament_size)
+                parents.append(selected)        
+                new_population = elites[:]
         
         while len(new_population) < pop_size:
             parent1, parent2 = random.sample(parents, 2)
@@ -459,9 +491,6 @@ def genetic_algorithm(
     return tour, tour_length, max_it, pop_size
 
 tour, tour_length, max_it, pop_size = genetic_algorithm(num_cities, dist_matrix)
-
-print("Best tour:", tour)
-print("Tour length:", tour_length)
 
 
 

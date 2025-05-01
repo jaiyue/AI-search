@@ -270,7 +270,7 @@ print("The codes and tariffs have been read from 'alg_codes_and_tariffs.txt':")
 ############
 ############ END OF SECTOR 5 (IGNORE THIS COMMENT)
 
-my_user_name = "llpw83"
+my_user_name = "abcd12"
 
 ############ START OF SECTOR 6 (IGNORE THIS COMMENT)
 ############
@@ -283,8 +283,8 @@ my_user_name = "llpw83"
 ############
 ############ END OF SECTOR 6 (IGNORE THIS COMMENT)
 
-my_first_name = "H"
-my_last_name = "Cai"
+my_first_name = ""
+my_last_name = ""
 
 ############ START OF SECTOR 7 (IGNORE THIS COMMENT)
 ############
@@ -294,7 +294,7 @@ my_last_name = "Cai"
 ############
 ############ END OF SECTOR 7 (IGNORE THIS COMMENT)
 
-algorithm_code = "AC"
+algorithm_code = "XX"
 
 ############ START OF SECTOR 8 (IGNORE THIS COMMENT)
 ############
@@ -356,117 +356,19 @@ added_note = ""
 ############ END OF SECTOR 9 (IGNORE THIS COMMENT)
 
 
-# build tour for an ant
-def single_path(num_cities, dist_matrix, pheromone, alpha, beta):
-    current = random.randint(0, num_cities - 1)
-    tour = [current]
-    visited = {current}
-
-    while len(tour) < num_cities:
-        next_city = selection(current, visited, dist_matrix, pheromone, alpha, beta)
-        tour.append(next_city)
-        visited.add(next_city)
-        current = next_city
-
-    return tour
-
-# next city selection
-def selection(current, visited, dist_matrix, pheromone, alpha, beta):
-    probabilities = []
-    total = 0.0
-
-    for city in range(len(dist_matrix)):
-        if city not in visited:
-            pher = pheromone[current][city]
-            eta = 1.0 / (dist_matrix[current][city] if dist_matrix[current][city] != 0 else 1e-10)
-            p = (pher ** alpha) * (eta ** beta)
-            probabilities.append((city, p))
-            total += p
-
-    if total == 0:
-        return random.choice([c for c in range(len(dist_matrix)) if c not in visited])
-
-    r = random.uniform(0, total)
-    s = 0.0
-    for city, p in probabilities:
-        s += p
-        if s >= r:
-            return city
-
-# tour length calculation
-def compute_length(tour, dist_matrix):
-    total_length = 0
-    num_cities = len(tour)
-    
-    for i in range(num_cities):
-        current_city = tour[i]
-        next_city = tour[(i + 1) % num_cities]
-        distance = dist_matrix[current_city][next_city]
-        total_length += distance
-
-    return total_length
-
-# pheromones all evaporate proportionally
-def evaporate(pheromone, rho):
-    num_cities = len(pheromone)
-    for i in range(num_cities):
-        for j in range(num_cities):
-            pheromone[i][j] *= (1 - rho)
-
-# Pheromones of different intensities are assigned to the top few best paths in the path ranking
-def rank_based_update(pheromone, ant_solutions, Q, rank_count):
-    ant_solutions.sort(key=lambda x: x[1])
-    num_cities = len(pheromone)
-    for rank, (tour, length) in enumerate(ant_solutions[:rank_count]):
-        delta = Q * (rank_count - rank) / length
-        for i in range(num_cities):
-            a, b = tour[i], tour[(i + 1) % num_cities]
-            pheromone[a][b] += delta
-            pheromone[b][a] += delta
-
-# elite_strategy: Strengthening a globally optimal path
-def elite_strategy(pheromone, best_tour, best_length, Q, elite_weight):
-    delta_elite = elite_weight * Q / best_length
-    for i in range(len(best_tour)):
-        a, b = best_tour[i], best_tour[(i + 1) % len(best_tour)]
-        pheromone[a][b] += delta_elite
-        pheromone[b][a] += delta_elite
-
-# Main function
-def ant_colony_tsp(num_cities, dist_matrix, num_ants=20, max_it=200, alpha=2, beta=3,
-                   rho_start=0.2, rho_end=0.05, Q=1, elite_weight=2, rank_count=5, time_limit=58):
-    
-    pheromone = [[1.0 for _ in range(num_cities)] for _ in range(num_cities)]
-    best_tour = None
-    best_length = float('inf')
-    start_time = time.time()
-
-    for iteration in range(max_it):
-        if time.time() - start_time > time_limit:
-            break
-
-        rho = rho_start - (rho_start - rho_end) * (iteration / max_it)
-
-        ant_solutions = []
-        for _ in range(num_ants):
-            tour = single_path(num_cities, dist_matrix, pheromone, alpha, beta)
-            length = compute_length(tour, dist_matrix)
-            ant_solutions.append((tour, length))
-            if length < best_length:
-                best_length = length
-                best_tour = tour[:]
-
-        evaporate(pheromone, rho)
-        rank_based_update(pheromone, ant_solutions, Q, rank_count)
-
-        # using elitee_strategy
-        if iteration > max_it * 2 / 3: #or (time.time() - start_time) > 50:
-            elite_strategy(pheromone, best_tour, best_length, Q, elite_weight)
-
-    return best_tour, best_length, max_it, num_ants
 
 
-tour, tour_length, max_it, num_ants = ant_colony_tsp(num_cities, dist_matrix)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

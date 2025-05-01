@@ -1,13 +1,13 @@
 USER = llpw83 (H Cai),
-ALGORITHM CODE = GA, NAME OF CITY-FILE = AISearchfile175.txt,
-SIZE = 175, TOUR LENGTH = 21719,
-138,24,94,37,140,43,17,166,124,83,61,35,115,4,132,7,122,90,167,164,169,68,22,79,52,100,1,154,109,53,111,121,160,172,116,60,59,99,150,31,129,44,65,93,112,18,134,92,106,98,11,127,131,15,118,163,86,152,168,130,144,76,9,67,155,143,34,8,171,139,19,14,97,71,96,0,145,47,12,82,119,81,103,3,162,45,125,170,161,28,74,51,136,5,13,72,54,70,142,10,25,27,148,50,173,133,151,108,36,153,95,141,56,120,107,165,39,84,40,87,62,2,64,91,159,80,20,42,66,147,49,58,105,77,33,21,126,69,101,30,57,146,41,104,6,23,110,63,117,38,128,85,149,135,78,156,75,123,16,137,48,73,26,55,46,29,88,157,113,158,89,32,114,102,174,
+ALGORITHM CODE = GA, NAME OF CITY-FILE = AISearchfile042.txt,
+SIZE = 42, TOUR LENGTH = 1205,
+21,16,31,8,33,37,19,0,11,32,14,4,39,15,9,12,5,22,1,20,26,30,24,41,17,18,40,29,27,36,23,35,34,38,7,3,13,10,25,6,2,28,
 NOTE = Multi-start Nearest Neighbor Initialization: Execute the nearest neighbor algorithm from multiple different starting points to construct initial solutions, improving the quality and diversity of the initial population.
 Elite Selection: Preserve the best individuals in each generation without subjecting them to crossover and mutation, preventing the loss of optimal solutions during evolution.
 Top-k Parent Selection: Select the top-ranking individuals as parents based on path length sorting, ensuring crossover occurs between high-quality solutions.
 Partially Mapped Crossover (PMX): Exchange gene segments between two parents while maintaining city uniqueness to generate valid offspring paths.
 Reverse Mutation: Randomly select and reverse a segment of the path to break out of local optima and increase population diversity.
-The parameter values are 'max_it' = 800 and 'pop_size' = 150.
-RUN-TIME = 52.2 seconds.
-DATE-TIME = 30/04/2025-20:02:21.
-CERTIFICATE = 12376.
+The parameter values are 'max_it' = 800 and 'pop_size' = 100.
+RUN-TIME = 3.2 seconds.
+DATE-TIME = 30/04/2025-21:15:36.
+CERTIFICATE = 2203.
